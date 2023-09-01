@@ -9,7 +9,7 @@ services:
       uvicorn main:app
       --host 0.0.0.0 --port 8000
       --lifespan=on --use-colors --http httptools
-      --log-config=log-conf.yaml
+      --log-config=log-conf.conf
       --reload
       "
     volumes:
