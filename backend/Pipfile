@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = "*"
+fastapi = {version = "0.103.0"}
 python-multipart = "*"
 motor = "*"
 uvicorn = {extras = ["standard"], version = "*"}
@@ -15,4 +15,4 @@ passlib = {extras = ["bcrypt"], version = "*"}
 [dev-packages]
 
 [requires]
-python_version = "3.11"
+python_version = "3.9"
