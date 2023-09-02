@@ -1,8 +1,7 @@
 import json
 from datetime import datetime, date
-from bson import ObjectId
-
-from bson import json_util
+from bson import ObjectId, Decimal128
+from decimal import Decimal
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -17,6 +16,9 @@ class JSONEncoder(json.JSONEncoder):
             return str(o)
         if isinstance(o, (datetime, date)):
             return o.isoformat()
+        # Safely converting monetary amounts to Decimal types to avoid python's approximation of floats
+        if isinstance(o, (Decimal128, Decimal)):
+            return str(o)
         return json.JSONEncoder.default(self, o)
 
 
@@ -32,7 +34,7 @@ def jsonHelper(data: any) -> dict:
     return json.loads(JSONEncoder().encode(data))
 
 
-# TODO: Look into why this converted returned an object for all default type objects.
+# TODO: Look into why this convertion returned an object for all default type objects.
 # class JSONEncoder(json.JSONEncoder):
 #     def default(self, o):
 #         if isinstance(o, ObjectId):
