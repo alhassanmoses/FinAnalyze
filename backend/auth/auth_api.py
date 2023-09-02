@@ -1,24 +1,24 @@
-import json
-import bson.json_util as json_util
-from auth.schema import NewUser, User
-from dependencies.sharedutils.db import db
-
+from typing import Union
+from datetime import timedelta
 from fastapi import APIRouter, HTTPException, Depends, Request, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
+
+from auth.data_util import (
+    create_user,
+    authenticate_user,
+    create_access_token,
+)
+from auth.schema import NewUser, User, TokenReturn
+from dependencies.sharedutils.jsonencoder import jsonHelper
 from dependencies.settings import settings
-from auth.database import get_by_id, create_user, authenticate_user
-from dependencies.sharedutils.jsonencoder import JSONEncoder
 
 user_router = APIRouter(
     prefix="/user",
     tags=["Users"],
     # dependencies=[Depends()], # TODO: implement a token checker for the headers
-    responses={404: {"description": "Resource Not found"}},
+    responses={status.HTTP_404_NOT_FOUND: {"description": "Resource Not found"}},
 )
-
-
-Oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @user_router.post(
@@ -30,33 +30,42 @@ async def sign_up(request: Request, new_user: NewUser):
 
     user = await create_user(new_user, users)
 
-    return JSONResponse(
-        status_code=status.HTTP_201_CREATED,
-        content=json.loads(JSONEncoder().encode(user)),
-    )
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonHelper(user))
 
 
-# content=json.loads(json_util.dumps(user))
-
-
-@user_router.post("/token", summary="Create a User token.")
-async def sign_up(
+@user_router.post("/login", summary="Generate a User token.")
+# response_model=TokenReturn
+async def get_token(
     request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
+    """Returns a signed token along with the user's data
+
+    Args:
+        request (Request): The request Object injected as a dependency.
+        form_data (OAuth2PasswordRequestForm, optional): Username and Password. Defaults to Depends().
+
+    Returns:
+        TokenReturn: A json containing the signed token along with the user's details
+    """
     users = request.app.db.users
 
-    auth_user = await authenticate_user(form_data.username, form_data.password, users)
+    auth_user: Union[bool, User] = await authenticate_user(
+        form_data.username, form_data.password, users
+    )
 
     if not auth_user:
         return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            details="Incorrect username or password provided.",
+            detail="Incorrect username or password provided.",
         )
 
-    return json.loads(JSONEncoder().encode(auth_user))
+    user_data = jsonHelper(auth_user)
 
+    access_token = create_access_token(
+        data={"sub": user_data["_id"]}, expires_delta=timedelta(minutes=60)
+    )
 
-# @user_router.post("/token", summary="Create a User token.")
-# async def sign_up(token: str = Depends(Oauth2_scheme)):
-#     pass
+    user_data.update({"access_token": access_token, "token_type": "bearer"})
+
+    return user_data  # JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=user_data)

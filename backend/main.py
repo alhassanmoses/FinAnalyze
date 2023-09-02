@@ -2,7 +2,7 @@ import os
 import logging
 
 from dependencies.settings import settings
-
+from dependencies.sharedutils.db import db
 from core_service.routes import router
 
 from fastapi import (
@@ -20,7 +20,7 @@ from fastapi import (
     BackgroundTasks,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from dependencies.sharedutils.db import db
+from motor.core import AgnosticDatabase, AgnosticClient
 
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,8 @@ app.add_middleware(
 async def startup_db_client():
     if "MONGODB_URL" in os.environ:
         await db.connect(settings.MONGODB_URL)
-        app.db = db.get_client()[settings.MONGODB_DB_NAME]
+        app.db: AgnosticDatabase = db.get_client()[settings.MONGODB_DB_NAME]
+        app.current_user_id = None
 
 
 @app.on_event("shutdown")

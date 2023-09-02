@@ -3,7 +3,7 @@ import pydantic
 
 from typing import Optional
 from pydantic import EmailStr, Field
-from bson import ObjectId
+from bson.objectid import ObjectId
 from core_service.base import Base
 from fastapi import Body
 
@@ -26,4 +26,10 @@ class NewUser(UserBase):
 
 
 class User(UserBase):
-    id: ObjectId = Field(..., alias="_id")
+    id: str = Field(..., alias="_id")
+
+
+class TokenReturn(UserBase):
+    id: str = Field(..., alias="_id")
+    access_token: str
+    token_type: str
