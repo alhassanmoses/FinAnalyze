@@ -1,11 +1,11 @@
-import pydantic
-from core_service.base import Base
-from typing import Optional
-from pydantic import EmailStr
 import datetime
-from fastapi import Body
+import pydantic
 
-datetime.datetime.utcnow().isoformat()
+from typing import Optional
+from pydantic import EmailStr, Field
+from bson import ObjectId
+from core_service.base import Base
+from fastapi import Body
 
 
 class UserBase(Base):
@@ -23,3 +23,7 @@ class UserBase(Base):
 
 class NewUser(UserBase):
     password: str = Body(..., min_length=6, max_length=64)
+
+
+class User(UserBase):
+    id: ObjectId = Field(..., alias="_id")

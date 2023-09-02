@@ -1,13 +1,9 @@
 import os
 import logging
-import bcrypt
 
 from dependencies.settings import settings
 
 from core_service.routes import router
-
-# from core_service.endpoints import transaction_router
-# from backend.auth.api import user_router
 
 from fastapi import (
     APIRouter,
@@ -66,6 +62,7 @@ app.add_middleware(
 async def startup_db_client():
     if "MONGODB_URL" in os.environ:
         await db.connect(settings.MONGODB_URL)
+        app.db = db.get_client()[settings.MONGODB_DB_NAME]
 
 
 @app.on_event("shutdown")
