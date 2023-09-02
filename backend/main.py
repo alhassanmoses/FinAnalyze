@@ -1,6 +1,16 @@
 import os
+import logging
+import bcrypt
+
+from dependencies.settings import settings
+
+from core_service.routes import router
+
+# from core_service.endpoints import transaction_router
+# from backend.auth.api import user_router
 
 from fastapi import (
+    APIRouter,
     Body,
     Depends,
     FastAPI,
@@ -14,8 +24,10 @@ from fastapi import (
     BackgroundTasks,
 )
 from fastapi.middleware.cors import CORSMiddleware
+from dependencies.sharedutils.db import db
 
-from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 description = """
 FinAnalyze API helps user manage and gain insights on their day to day transactions.
@@ -34,19 +46,32 @@ app = FastAPI(
         email="alhassanmoses.amw@gmail.com",
     ),
     openapi_url="/api/v1/openapi.json",
-    docs_url="/api-docs",
-    redoc_url="/external/api-docs",
+    docs_url="/api/v1/docs",
+    redoc_url="/external-api/v1/docs",
 )
 
-origins = os.environ.get("ORIGINS", "").split(",")
+
+app.include_router(router, prefix="/api/v1")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.ALLOWED_ORIGINS.split(" "),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def startup_db_client():
+    if "MONGODB_URL" in os.environ:
+        await db.connect(settings.MONGODB_URL)
+
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    if db.client:
+        db.client.close()
 
 
 @app.get("/")

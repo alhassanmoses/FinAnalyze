@@ -6,5 +6,6 @@ python-jose[cryptography]
 passlib[bcrypt]
 motor
 mock
-pytest
+pytest=1.10
 requests
+pyMongo
