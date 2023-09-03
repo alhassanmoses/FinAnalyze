@@ -2,7 +2,7 @@ import pydantic
 import logging
 
 from bson import ObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 from datetime import datetime
 from typing import Optional
 
@@ -36,9 +36,26 @@ class ObjectIdField(ObjectId):
 
 
 class Base(BaseModel):
-    created: datetime = Body(datetime.utcnow())
-    last_modified: datetime = datetime.utcnow()
-    _deleted: Optional[datetime]
+    last_modified: datetime = Field(
+        default_factory=datetime.utcnow, description="Timestamp of last modification"
+    )
+    created: datetime = Field(
+        default_factory=datetime.utcnow, description="Timestamp of last modification"
+    )
+
+    deleted: Optional[datetime] = None
+
+    @validator("created", pre=True, always=True)
+    def set_created(cls, v):
+        return datetime.utcnow()
+
+    @validator("deleted", pre=True, always=True)
+    def set_deleted(cls, v):
+        return None
+
+    @validator("last_modified", pre=True, always=True)
+    def set_last_modified(cls, v):
+        return datetime.utcnow()
 
     @staticmethod
     async def get_by_id(id: any, collection: str, db: AgnosticDatabase):
@@ -59,5 +76,32 @@ class Base(BaseModel):
                 detail=gettext("FAILED_TO_RETRIEVE_RECORD"),
             )
 
+    class Config:
+        allow_population_by_field_name = True
+
     def to_dict(self) -> any:
-        return jsonable_encoder(self)
+        return jsonable_encoder(self, exclude=["created", "last_modified", "deleted"])
+
+    def dict(self, *args, **kwargs):
+        # Exclude created and last_modified fields from request payload (POST/PUT)
+        if "exclude" in kwargs:
+            vals_to_exclude = {
+                1,
+                "created",
+                2,
+                "last_modified",
+                3,
+                "deleted",
+            }
+            kwargs["exclude"].update(vals_to_exclude)
+        else:
+            kwargs["exclude"] = {
+                1,
+                "created",
+                2,
+                "last_modified",
+                3,
+                "deleted",
+            }
+
+        return super().dict(*args, **kwargs)

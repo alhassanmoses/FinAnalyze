@@ -1,5 +1,6 @@
 from dependencies.settings import settings
 from dependencies.sharedutils.api_messages import gettext
+from dependencies.sharedutils.db import get_base_query
 
 from typing import Dict
 from jose import jwt
@@ -73,6 +74,8 @@ async def authenticate_user(username, password, db: AgnosticDatabase):
 
     if not user or not pwd_context.verify(password, user["password"]):
         return False
+
+    del user["password"]
     return user
 
 
@@ -92,8 +95,13 @@ async def create_user(user_data, db: AgnosticDatabase):
     # Store the user in the database
 
     new_user = await db.users.insert_one(
-        {**user_data.dict(), "password": user_data.password}
+        {
+            **user_data.dict(),
+            "password": user_data.password,
+            **get_base_query(is_insert=True),
+        }
     )
 
     user = await NewUser.get_by_id(str(new_user.inserted_id), "users", db)
+    del user["password"]
     return user

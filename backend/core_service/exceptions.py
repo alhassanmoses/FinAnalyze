@@ -10,3 +10,7 @@ class InvalidId(Exception):
 
 class CurrentUserNotFound(HTTPException):
     """Raised when a request to a protected route fails to retrived the active user"""
+
+
+class NoneOwnerPermissionDenied(HTTPException):
+    """Raised when a request is made to a protected route using someone elses ID"""

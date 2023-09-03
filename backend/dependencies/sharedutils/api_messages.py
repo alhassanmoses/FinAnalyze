@@ -7,13 +7,15 @@ If language changes, set `dependencies.sharedutils.api_messages.default_locale` 
 """
 import json
 import os
+import logging
 
 default_locale = "en-gb"
 cached_messages = {}
 
 
 def refresh():
-    print("Refreshing API response language...")  # TODO: use logs instead
+    logging.info("Refreshing API response language...")
+
     global cached_messages
     with open(f"{os.getcwd()}/API_MESSAGES/{default_locale}.json") as f:
         cached_messages = json.load(f)

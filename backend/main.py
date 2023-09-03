@@ -54,6 +54,10 @@ async def startup_db_client():
         app.db: AgnosticDatabase = db.get_client()[settings.MONGODB_DB_NAME]
         app.current_user_id = None
 
+        # app.db.users.delete_many({})
+        # app.db.transactions.delete_many({})
+        # app.db.client.close()
+
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

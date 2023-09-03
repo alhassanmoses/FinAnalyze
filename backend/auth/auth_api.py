@@ -24,6 +24,7 @@ user_router = APIRouter(
 
 @user_router.post(
     "/sign_up",
+    response_model=User,
     summary="Create a user account.",
 )
 async def sign_up(request: Request, new_user: NewUser):
@@ -35,7 +36,6 @@ async def sign_up(request: Request, new_user: NewUser):
 
 
 @user_router.post("/login", summary="Generate a User token.")
-# response_model=TokenReturn
 async def get_token(
     request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),

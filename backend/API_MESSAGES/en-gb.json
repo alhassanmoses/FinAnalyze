@@ -8,5 +8,6 @@
     "FAILED_DB_PERSIST": "Failed to save the record to the database.",
     "UNKNOWN_EXCEPTION": "Sorry, an error occured, kinldy notify support staff for immediate assistance.",
     "INVALID_ID_PROVIDED": "Invalid ID({}) provided for '{}'.",
-    "FAILED_TO_RETRIEVE_RECORD": "Failed to reteive any record with the provided ID, please provide a valid ID."
+    "FAILED_TO_RETRIEVE_RECORD": "Failed to reteive any record with the provided ID, please provide a valid ID.",
+    "INVALID_RESOURCE_REQUEST": "Current user_id does not match that of the user who's details being requested."
 }

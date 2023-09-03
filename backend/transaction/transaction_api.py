@@ -9,31 +9,25 @@ from transaction.data_util import (
     get_records,
     update_record,
     remove_record,
+    get_analytics,
 )
 from dependencies.sharedutils.jsonencoder import jsonHelper
-from core_service.exceptions import CurrentUserNotFound
+from dependencies.sharedutils.api_messages import gettext
+from core_service.exceptions import CurrentUserNotFound, NoneOwnerPermissionDenied
 from auth.schema import User
 
 from fastapi import APIRouter, status, Depends, Request, Body, Path
 from fastapi.responses import JSONResponse
 from bson.codec_options import TypeCodec, TypeRegistry
-from bson import ObjectId
 from bson.decimal128 import Decimal128
-from bson.errors import InvalidId
+from typing import List, Optional, Dict
 from decimal import Decimal
-from typing import List, Optional
-
 
 transaction_router = APIRouter(
     prefix="/transaction",
     tags=["Transaction"],
     responses={status.HTTP_404_NOT_FOUND: {"description": "Resource Not found"}},
 )
-
-
-@transaction_router.get("/home", summary="Generate a User token.")
-async def go_home():
-    return "Json"
 
 
 class Decimal128Converter(TypeCodec):
@@ -93,24 +87,6 @@ async def get_transactions(request: Request):
     return JSONResponse(status_code=status.HTTP_200_OK, content=jsonHelper(records))
 
 
-@transaction_router.get(
-    "/{record_id:str}",
-    response_model=TransactionGetResponse,
-    summary="Retrieve a transaction record for a given record_id.",
-)
-async def get_transaction(
-    request: Request,
-    record_id: str = Path(
-        ..., title="The Transaction Record ID for the record to be retrieved"
-    ),
-):
-    db = request.app.db
-
-    record: dict = await retrieve_record(record_id, db)
-
-    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonHelper(record))
-
-
 @transaction_router.put(
     "/update/{record_id:str}",
     response_model=TransactionGetResponse,
@@ -161,3 +137,47 @@ async def delete_transaction(
         return JSONResponse(
             status_code=status.HTTP_200_OK, content={"message": "success"}
         )
+
+
+@transaction_router.get(
+    "/analytics/{user_id:str}",
+    summary="Analyses a users records to provides userful insights.",
+)
+async def analyse_records(
+    request: Request,
+    user_id: str = Path(
+        ..., description="The ID of the user who's records are to be analysed."
+    ),
+):
+    db = request.app.db
+    current_user_id = request.app.current_user_id
+
+    if user_id is None:
+        raise CurrentUserNotFound
+    if user_id != current_user_id:
+        raise NoneOwnerPermissionDenied(
+            status_code=status.HTTP_RESOURCE_REQUEST,
+            detail=gettext("INVALID_RESOURCE_REQUEST"),
+        )
+
+    records: List[Dict[str, any]] = await get_analytics(user_id, db)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonHelper(records))
+
+
+@transaction_router.get(
+    "/{record_id:str}",
+    response_model=TransactionGetResponse,
+    summary="Retrieve a transaction record for a given record_id.",
+)
+async def get_transaction(
+    request: Request,
+    record_id: str = Path(
+        ..., title="The Transaction Record ID for the record to be retrieved"
+    ),
+):
+    db = request.app.db
+
+    record: dict = await retrieve_record(record_id, db)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonHelper(record))

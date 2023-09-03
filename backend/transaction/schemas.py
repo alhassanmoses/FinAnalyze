@@ -38,6 +38,10 @@ class TransactionBase(Base):
 
     @pydantic.validator("display_amount", pre=True, always=True)
     def default_ts_display_amount(cls, v, *, values, **kwargs):
+        try:
+            str(values["amount"])
+        except:
+            raise ValueError("Value is not a valid decimal")
         return v or f"{values.get('currency', '$')}{str(values['amount'])}"
 
     # Previous Decimal validation implementation before I went with the convertor class approach
@@ -58,9 +62,9 @@ class TransactionBase(Base):
                 "_id": "64f418856b25680d5292fa50",
                 "transaction_type": "credit",
                 "status": "pending",
-                "amount": "2000",
+                "amount": "2500.89",
                 "currency": "$",
-                "display_amount": "$2000",
+                "display_amount": "$2500.89",
                 "created": "2023-09-02T16:58:44.329000",
                 "last_modified": "2023-09-02T16:58:59.230000",
                 "user_id": "64f418aeff9dc97eeef2ea08",
@@ -89,9 +93,9 @@ class Transaction(TransactionBase):
                 "_id": "7779836983",
                 "transaction_type": "credit",
                 "status": "pending",
-                "amount": "2000",
+                "amount": "2500.89",
                 "currency": "$",
-                "display_amount": "$2000",
+                "display_amount": "$2500.89",
                 "created": "2023-09-02T16:58:44.329000",
                 "last_modified": "2023-09-02T16:58:59.230000",
                 "user": {
@@ -102,8 +106,8 @@ class Transaction(TransactionBase):
                     "email": "alhassanmoses.amw@gmail.com",
                     "username": "moseswuniche",
                     "fullname": "Moses Wuniche Alhassan",
-                    "created": "2023-09-02T16:58:24.129000",
-                    "last_modified": "2023-09-02T16:58:24.130000",
+                    "created": "2023-09-03T15:54:21.367000",
+                    "last_modified": "2023-09-03T15:54:21.367000",
                 },
                 "title": "Transaction Model",
                 "description": "A __model__ representing a __Transaction Record__ insatance.",
@@ -126,9 +130,9 @@ class TransactionGetResponse(TransactionBase):
                 "_id": "64f418b6ff9dc97eeef2ea09",
                 "transaction_type": "credit",
                 "status": "pending",
-                "amount": "2000",
+                "amount": "2500.89",
                 "currency": "$",
-                "display_amount": "$2000",
+                "display_amount": "$2500.89",
                 "created": "2023-09-02T16:58:44.329000",
                 "last_modified": "2023-09-02T16:58:59.230000",
                 "user_id": "64f418beff9dc97eeef2ea0b",
@@ -153,7 +157,7 @@ class TransactionUpdate(Base):
             "example": {
                 "transaction_type": "credit",
                 "status": "pending",
-                "display_amount": "$2000",
+                "display_amount": "$89.47",
             },
             "title": "Transaction Update Request Model",
             "description": "A __model__ representing a __Transaction Record__ update request schema.",
