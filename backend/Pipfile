@@ -5,12 +5,13 @@ name = "pypi"
 
 [packages]
 fastapi = {version = "0.103.0"}
-python-multipart = "*"
-motor = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 pydantic = {extras = ["email"], version = "1.10"}
+python-multipart = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
+motor = "*"
+mock = "*"
 
 [dev-packages]
 

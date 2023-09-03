@@ -1,21 +1,12 @@
-"""Exceptions raised by the BSON package."""
+"""Custom Exceptions"""
 
 
-class BSONError(Exception):
-    """Base class for all BSON exceptions."""
+from fastapi import HTTPException
 
 
-class InvalidBSON(BSONError):
-    """Raised when trying to create a BSON object from invalid data."""
-
-
-class InvalidStringData(BSONError):
-    """Raised when trying to encode a string containing non-UTF8 data."""
-
-
-class InvalidDocument(BSONError):
-    """Raised when trying to create a BSON object from an invalid document."""
-
-
-class InvalidId(BSONError):
+class InvalidId(Exception):
     """Raised when trying to create an ObjectId from invalid data."""
+
+
+class CurrentUserNotFound(HTTPException):
+    """Raised when a request to a protected route fails to retrived the active user"""

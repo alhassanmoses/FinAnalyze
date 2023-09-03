@@ -1,3 +1,12 @@
 {
-    "First": "Sorry, an error occured."
+    "COULD_NOT_VALIDATE": "Could not validate credentials.",
+    "TRANSACTION_WITH_INVALID_USER_ID": "Invalid request, the user issuing this transaction does not exist on this platform.",
+    "USERNAME_EXIST": "The provided username already registered.",
+    "INVALID_OBJECT_ID": "Invalid ObjectId provided.",
+    "TOKEN_EXPIRED": "The token provided is expired.",
+    "INVALID_CREDENTIALS": "Incorrect username or password provided.",
+    "FAILED_DB_PERSIST": "Failed to save the record to the database.",
+    "UNKNOWN_EXCEPTION": "Sorry, an error occured, kinldy notify support staff for immediate assistance.",
+    "INVALID_ID_PROVIDED": "Invalid ID({}) provided for '{}'.",
+    "FAILED_TO_RETRIEVE_RECORD": "Failed to reteive any record with the provided ID, please provide a valid ID."
 }

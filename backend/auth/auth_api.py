@@ -1,3 +1,4 @@
+import logging
 from typing import Union
 from datetime import timedelta
 from fastapi import APIRouter, HTTPException, Depends, Request, status
@@ -9,9 +10,9 @@ from auth.data_util import (
     authenticate_user,
     create_access_token,
 )
-from auth.schema import NewUser, User, TokenReturn
+from auth.schema import NewUser, User
 from dependencies.sharedutils.jsonencoder import jsonHelper
-from dependencies.settings import settings
+from dependencies.sharedutils.api_messages import gettext
 
 user_router = APIRouter(
     prefix="/user",
@@ -26,9 +27,9 @@ user_router = APIRouter(
     summary="Create a user account.",
 )
 async def sign_up(request: Request, new_user: NewUser):
-    users = request.app.db.users
+    db = request.app.db
 
-    user = await create_user(new_user, users)
+    user = await create_user(new_user, db)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonHelper(user))
 
@@ -57,7 +58,7 @@ async def get_token(
     if not auth_user:
         return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password provided.",
+            detail=gettext("INVALID_CREDENTIALS"),
         )
 
     user_data = jsonHelper(auth_user)

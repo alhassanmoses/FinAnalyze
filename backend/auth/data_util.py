@@ -1,22 +1,18 @@
 from dependencies.settings import settings
+from dependencies.sharedutils.api_messages import gettext
 
-from typing import Dict, Optional
+from typing import Dict
 from jose import jwt
+from bson import ObjectId
 from passlib.context import CryptContext
 from fastapi import HTTPException, Depends, status, Request
+from fastapi.security import OAuth2PasswordBearer
 from datetime import timedelta, datetime
 from motor.core import AgnosticDatabase
+from auth.schema import NewUser
 
-from fastapi.security import OAuth2PasswordBearer
 
 pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-async def get_by_id(id: any, db: AgnosticDatabase):
-    entity = await db.find_one({"_id": id})
-    if entity is not None:
-        return entity
-    return None
 
 
 async def verify_access_token():
@@ -31,7 +27,7 @@ def verify_access_token(token: str):
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Could not validate credentials",
+            detail=gettext("COULD_NOT_VALIDATE"),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -52,12 +48,12 @@ async def get_current_user(
         return user_id
     except jwt.ExpiredSignatureError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=gettext("TOKEN_EXPIRED")
         )
     except jwt.JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail=gettext("COULD_NOT_VALIDATE"),
         )
 
 
@@ -89,15 +85,15 @@ async def create_user(user_data, db: AgnosticDatabase):
     user_data.password: str = get_password_hash(user_data.password)
 
     # Check if the username already exists
-    existing_user = await db.find_one({"username": user_data.username})
+    existing_user = await db.users.find_one({"username": user_data.username})
     if existing_user:
-        raise HTTPException(
-            status_code=400, detail="The provided username already registered"
-        )
+        raise HTTPException(status_code=400, detail=gettext("USERNAME_EXIST"))
 
     # Store the user in the database
-    new_user = await db.insert_one(user_data.dict())
 
-    user = await get_by_id(new_user.inserted_id, db)
+    new_user = await db.users.insert_one(
+        {**user_data.dict(), "password": user_data.password}
+    )
 
+    user = await NewUser.get_by_id(str(new_user.inserted_id), "users", db)
     return user

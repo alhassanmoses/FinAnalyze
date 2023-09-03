@@ -8,4 +8,4 @@ motor
 mock
 pytest=1.10
 requests
-pyMongo
+cachetools

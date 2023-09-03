@@ -5,22 +5,10 @@ from dependencies.settings import settings
 from dependencies.sharedutils.db import db
 from core_service.routes import router
 
-from fastapi import (
-    APIRouter,
-    Body,
-    Depends,
-    FastAPI,
-    Query,
-    Path,
-    Header,
-    status,
-    Form,
-    HTTPException,
-    Request,
-    BackgroundTasks,
-)
+from fastapi import FastAPI
+
 from fastapi.middleware.cors import CORSMiddleware
-from motor.core import AgnosticDatabase, AgnosticClient
+from motor.core import AgnosticDatabase
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +16,8 @@ logger = logging.getLogger(__name__)
 description = """
 FinAnalyze API helps user manage and gain insights on their day to day transactions.
 
-## Transactions 
+## Users
+## Transactions
 
 """
 app = FastAPI(
