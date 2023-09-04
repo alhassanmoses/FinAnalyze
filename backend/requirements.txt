@@ -1,11 +1,12 @@
 fastapi~=0.103.0
 uvicorn[standard]
-pydantic[email]
+pydantic[email] == 1.10
 python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
 motor
 mock
-pytest=1.10
+pytest
 requests
 cachetools
+httpx

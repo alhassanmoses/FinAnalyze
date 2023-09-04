@@ -1,6 +1,6 @@
 from dependencies.settings import settings
 
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from motor.core import AgnosticClient
 
 from typing import Optional
@@ -17,6 +17,9 @@ class Database:
     def get_client(self) -> AgnosticClient:
         return self.client
 
+    def close_session(self):
+        self.client.close()
+
 
 db = Database()
 
@@ -30,3 +33,9 @@ def get_base_query(is_insert=False, is_update=False):
         return {"last_modified": now}
     else:
         return {}
+
+
+async def get_database() -> AsyncIOMotorDatabase:
+    """A custom mongodb session manager"""
+    await db.connect(settings.MONGODB_URL)
+    return db.get_client()[settings.MONGODB_DB_NAME]

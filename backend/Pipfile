@@ -4,16 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = {version = "0.103.0"}
-uvicorn = {extras = ["standard"], version = "*"}
-pydantic = {extras = ["email"], version = "1.10"}
+fastapi = "~=0.103.0"
 python-multipart = "*"
-python-jose = {extras = ["cryptography"], version = "*"}
-passlib = {extras = ["bcrypt"], version = "*"}
 motor = "*"
 mock = "*"
+pytest = "*"
+requests = "*"
+cachetools = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+pydantic = {extras = ["email"], version = "==1.10"}
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"

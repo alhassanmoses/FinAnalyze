@@ -9,6 +9,7 @@ from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
 from motor.core import AgnosticDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorClient
 
 
 logger = logging.getLogger(__name__)
@@ -50,13 +51,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_db_client():
     if "MONGODB_URL" in os.environ:
-        await db.connect(settings.MONGODB_URL)
-        app.db: AgnosticDatabase = db.get_client()[settings.MONGODB_DB_NAME]
         app.current_user_id = None
-
-        # app.db.users.delete_many({})
-        # app.db.transactions.delete_many({})
-        # app.db.client.close()
 
 
 @app.on_event("shutdown")

@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     MONGODB_DB_NAME: str = os.environ.get("MONGODB_DB_NAME", "Testing_db_name")
     TEST_MODE: bool = os.environ.get("TEST_MODE", False)
     MONGODB_INIT_COLLECTION: str = os.environ.get("MONGODB_INIT_COLLECTION", "User")
-    AUTH_TOKEN_TTL: str = os.environ.get("AUTH_TOKEN_TTL", "User")
+    AUTH_TOKEN_TTL: str = (os.environ.get("AUTH_TOKEN_TTL", "User"),)
+    MONGODB_TEST_DB: str = os.environ.get("MONGODB_TEST_DB", "User")
 
 
 settings = Settings()

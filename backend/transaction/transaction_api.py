@@ -13,6 +13,7 @@ from transaction.data_util import (
 )
 from dependencies.sharedutils.jsonencoder import jsonHelper
 from dependencies.sharedutils.api_messages import gettext
+from dependencies.sharedutils.db import get_database
 from core_service.exceptions import CurrentUserNotFound, NoneOwnerPermissionDenied
 from auth.schema import User
 
@@ -22,6 +23,7 @@ from bson.codec_options import TypeCodec, TypeRegistry
 from bson.decimal128 import Decimal128
 from typing import List, Optional, Dict
 from decimal import Decimal
+from motor.motor_asyncio import AsyncIOMotorClient
 
 transaction_router = APIRouter(
     prefix="/transaction",
@@ -60,13 +62,12 @@ codec_options = codec_options = TypeRegistry([Decimal128Converter()])
 )
 async def create_transaction(
     request: Request,
+    db: AsyncIOMotorClient = Depends(get_database),
     transaction_record: CreateTransaction = Body(...),
 ):
     user_id = request.app.current_user_id
     if user_id is None:
         raise CurrentUserNotFound
-
-    db = request.app.db
 
     record: dict = await validate_record(user_id, transaction_record, db)
 
@@ -78,8 +79,10 @@ async def create_transaction(
     response_model=List[TransactionGetResponse],
     summary="Retrieve a transaction record for a given record_id.",
 )
-async def get_transactions(request: Request):
-    db = request.app.db
+async def get_transactions(
+    request: Request,
+    db: AsyncIOMotorClient = Depends(get_database),
+):
     current_user_id = request.app.current_user_id
 
     records = await get_records(current_user_id, db)
@@ -94,14 +97,13 @@ async def get_transactions(request: Request):
 )
 async def update_transaction(
     request: Request,
+    db: AsyncIOMotorClient = Depends(get_database),
     record_id: str = Path(..., description="The ID of the record to be updated."),
     new_record: TransactionUpdate = Body(...),
 ):
     user_id = request.app.current_user_id
     if user_id is None:
         raise CurrentUserNotFound
-
-    db = request.app.db
 
     old_record: dict = await retrieve_record(record_id, db)
 
@@ -119,10 +121,10 @@ async def update_transaction(
 )
 async def delete_transaction(
     request: Request,
+    db: AsyncIOMotorClient = Depends(get_database),
     record_id: str = Path(..., description="The ID of the record to be updated."),
 ):
     # TODO: Abstruct this initial repeating logic to a helper middleware
-    db = request.app.db
     user_id = request.app.current_user_id
     if user_id is None:
         raise CurrentUserNotFound
@@ -145,11 +147,11 @@ async def delete_transaction(
 )
 async def analyse_records(
     request: Request,
+    db: AsyncIOMotorClient = Depends(get_database),
     user_id: str = Path(
         ..., description="The ID of the user who's records are to be analysed."
     ),
 ):
-    db = request.app.db
     current_user_id = request.app.current_user_id
 
     if user_id is None:
@@ -171,13 +173,11 @@ async def analyse_records(
     summary="Retrieve a transaction record for a given record_id.",
 )
 async def get_transaction(
-    request: Request,
+    db: AsyncIOMotorClient = Depends(get_database),
     record_id: str = Path(
         ..., title="The Transaction Record ID for the record to be retrieved"
     ),
 ):
-    db = request.app.db
-
     record: dict = await retrieve_record(record_id, db)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=jsonHelper(record))

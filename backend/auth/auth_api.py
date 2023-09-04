@@ -13,6 +13,8 @@ from auth.data_util import (
 from auth.schema import NewUser, User
 from dependencies.sharedutils.jsonencoder import jsonHelper
 from dependencies.sharedutils.api_messages import gettext
+from motor.motor_asyncio import AsyncIOMotorClient
+from dependencies.sharedutils.db import get_database
 
 user_router = APIRouter(
     prefix="/user",
@@ -27,9 +29,7 @@ user_router = APIRouter(
     response_model=User,
     summary="Create a user account.",
 )
-async def sign_up(request: Request, new_user: NewUser):
-    db = request.app.db
-
+async def sign_up(new_user: NewUser, db: AsyncIOMotorClient = Depends(get_database)):
     user = await create_user(new_user, db)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonHelper(user))
@@ -37,7 +37,7 @@ async def sign_up(request: Request, new_user: NewUser):
 
 @user_router.post("/login", summary="Generate a User token.")
 async def get_token(
-    request: Request,
+    db: AsyncIOMotorClient = Depends(get_database),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
     """Returns a signed token along with the user's data
@@ -49,14 +49,15 @@ async def get_token(
     Returns:
         TokenReturn: A json containing the signed token along with the user's details
     """
-    users = request.app.db.users
+    # users = request.app.db.users
+    users = db.users
 
     auth_user: Union[bool, User] = await authenticate_user(
         form_data.username, form_data.password, users
     )
 
     if not auth_user:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=gettext("INVALID_CREDENTIALS"),
         )
