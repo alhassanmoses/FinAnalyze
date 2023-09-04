@@ -27,6 +27,7 @@ This documentation outlines the design, development, and deployment of the FinAn
   - [7. Monitoring and Logging](#7-monitoring-and-logging)
   - [8. Continuous Integration and Deployment (CI/CD)](#8-continuous-integration-and-deployment-cicd)
   - [9. Conclusion](#9-conclusion)
+    - [Connect with me:](#connect-with-me)
 
 ## 1. Setup and Run Instructions
 
@@ -154,4 +155,16 @@ The FinAnalyze API is a robust solution for managing financial transactions and 
 
 For any further inquiries or support, please contact me [alhassanmoses.amw@gmail.com](mailto:alhassanmoses.amw@gmail.com).
 
-Thank you for your attention, and I look forward to positive feedback!
+Thank you for your attention. This is the first application I've built using the FastAPI framework, I look forward to positive feedback!
+
+### Connect with me:
+
+[<img align="left" alt="TechnicalMisthios | Twitter" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/twitter.svg" />][twitter]
+[<img align="left" alt="TechnicalMisthios | LinkedIn" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/linkedin.svg" />][linkedin]
+[<img align="left" alt="TechnicalMisthios | Instagram" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/instagram.svg" />][instagram]
+[<img align="left" alt="TechnicalMisthios | Instagram" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/facebook.svg" />][facebook]
+
+[twitter]: https://twitter.com/moseswuniche
+[instagram]: https://instagram.com/alhassanmoses
+[linkedin]: https://www.linkedin.com/in/moses-wuniche-alhassan-4ab87412b/
+[facebook]: https://facebook.com/alhassanmoses
