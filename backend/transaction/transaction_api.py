@@ -129,7 +129,8 @@ async def delete_transaction(
     if user_id is None:
         raise CurrentUserNotFound
 
-    record: Optional[dict] = TransactionGetResponse.get_by_id(
+    # Might decide to return the deleted record later in the future
+    record: Optional[dict] = await TransactionGetResponse.get_by_id(
         record_id, "transactions", db
     )
 

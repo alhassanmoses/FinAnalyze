@@ -19,7 +19,7 @@ class TransactionTypeEnum(str, Enum):
 
 class TransactionStatusEnum(str, Enum):
     PENDING = "pending"
-    SUCCESS = "outgoing"
+    SUCCESS = "success"
     FAILED = "failed"
     NOT_FOUND = "not_found"
 

@@ -15,6 +15,7 @@ uvicorn = {extras = ["standard"], version = "*"}
 pydantic = {extras = ["email"], version = "==1.10"}
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
+httpx = "*"
 
 [dev-packages]
 

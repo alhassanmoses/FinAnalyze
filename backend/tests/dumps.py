@@ -1,4 +1,5 @@
 import random
+from decimal import Decimal
 
 user_template = {
     "firstname": "Moses",
@@ -24,16 +25,9 @@ random_users = [
 random_transactions = [
     {
         "transaction_type": random.choice(["credit", "debit"]),
-        "status": random.choice(["pending", "completed", "failed"]),
-        "amount": round(random.uniform(100.0, 5000.0), 2),
+        "status": random.choice(["pending", "success", "failed", "not_found"]),
+        "amount": str(round(random.uniform(100.0, 5000.0), 4)),
         "currency": random.choice(["$", "€", "£"]),
-        "display_amount": f"${round(random.uniform(100.0, 5000.0), 2)}",
-        "user_id": f"{random.randint(100000, 999999)}",
     }
     for _ in range(5)
 ]
-
-login_data = {
-    "username": user_template["username"],
-    "password": user_template["password"],
-}
